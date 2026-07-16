@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:the_garden}
+    username: ${DB_USERNAME:the_garden}
+    password: ${DB_PASSWORD:the_garden}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+logging:
+  level:
+    com.thegarden: DEBUG
+    org.hibernate.SQL: DEBUG

@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme {
+  /* The Garden — palette tuned for warm, natural, cinematic lighting */
+  --color-garden-50: #f4f8f1;
+  --color-garden-100: #e4edda;
+  --color-garden-300: #b7d19a;
+  --color-garden-500: #6f9b4f;
+  --color-garden-700: #4a6b34;
+  --color-garden-900: #24361a;
+
+  --color-light-divine: #fff6e0;
+  --color-shadow-valley: #1c2229;
+
+  --font-display: "Cormorant Garamond", ui-serif, serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background-color: var(--color-shadow-valley);
+    color: var(--color-light-divine);
+  }
+}

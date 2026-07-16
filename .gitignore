@@ -1,0 +1,38 @@
+# --- Node / Frontend ---
+node_modules/
+dist/
+build/
+.vite/
+.turbo/
+coverage/
+*.local
+.env
+.env.*.local
+
+# --- Java / Backend ---
+backend/build/
+backend/.gradle/
+backend/out/
+!backend/gradle/wrapper/gradle-wrapper.jar
+*.class
+*.jar
+!gradle-wrapper.jar
+
+# --- IDE ---
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# --- Logs ---
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# --- Env / Secrets ---
+.env
+*.env
+!*.env.example
+
+# --- OS ---
+Thumbs.db
