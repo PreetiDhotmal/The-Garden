@@ -24,9 +24,15 @@
     "three": "^0.185.1",
     "@react-three/fiber": "^9.6.1",
     "@react-three/drei": "^10.7.7",
-    "@react-three/rapier": "^2.2.0"
+    "@react-three/rapier": "^2.2.0",
+    "@dimforge/rapier3d-compat": "0.19.2",
+    "@react-three/postprocessing": "^3.0.4",
+    "postprocessing": "^6.39.3",
+    "simplex-noise": "^4.0.3",
+    "idb": "^8.0.3"
   },
   "devDependencies": {
+    "fake-indexeddb": "^6.2.5",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@types/three": "^0.185.1",

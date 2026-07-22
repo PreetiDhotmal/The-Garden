@@ -1,0 +1,86 @@
+{
+  "id": "dialogue:elder-greeting",
+  "startNodeId": "greeting",
+  "nodesById": {
+    "greeting": {
+      "id": "greeting",
+      "speakerName": "The Elder",
+      "portraitAssetId": null,
+      "pages": [
+        "Welcome, traveler. The Garden of Beginnings has waited long for someone like you.",
+        "Three ancient stones rest throughout this place, each bearing scripture worth discovering."
+      ],
+      "choices": [
+        {
+          "id": "ask-quest-not-started",
+          "text": "Tell me more about the stones.",
+          "targetNodeId": "offer-quest",
+          "condition": "quest:quest:garden-of-beginnings-shrines:AVAILABLE"
+        },
+        {
+          "id": "ask-quest-in-progress",
+          "text": "How is my search going?",
+          "targetNodeId": "check-progress",
+          "condition": "quest:quest:garden-of-beginnings-shrines:ACTIVE"
+        },
+        {
+          "id": "ask-quest-done",
+          "text": "I have found all three stones.",
+          "targetNodeId": "claim-reward",
+          "condition": "quest:quest:garden-of-beginnings-shrines:COMPLETED"
+        },
+        {
+          "id": "leave",
+          "text": "Farewell, Elder.",
+          "targetNodeId": "farewell",
+          "condition": null
+        }
+      ],
+      "condition": null,
+      "events": [],
+      "isTerminal": false
+    },
+    "offer-quest": {
+      "id": "offer-quest",
+      "speakerName": "The Elder",
+      "portraitAssetId": null,
+      "pages": [
+        "Seek them in the garden, the forest, and the sacred clearing. Each will reward your faith."
+      ],
+      "choices": [],
+      "condition": null,
+      "events": [{ "kind": "OFFER_QUEST", "questId": "quest:garden-of-beginnings-shrines" }],
+      "isTerminal": true
+    },
+    "check-progress": {
+      "id": "check-progress",
+      "speakerName": "The Elder",
+      "portraitAssetId": null,
+      "pages": ["Keep searching, child. The stones reveal themselves to the patient heart."],
+      "choices": [],
+      "condition": null,
+      "events": [],
+      "isTerminal": true
+    },
+    "claim-reward": {
+      "id": "claim-reward",
+      "speakerName": "The Elder",
+      "portraitAssetId": null,
+      "pages": ["You have done well. Receive this blessing for your faithfulness."],
+      "choices": [],
+      "condition": null,
+      "events": [{ "kind": "CLAIM_QUEST_REWARD", "questId": "quest:garden-of-beginnings-shrines" }],
+      "isTerminal": true
+    },
+    "farewell": {
+      "id": "farewell",
+      "speakerName": "The Elder",
+      "portraitAssetId": null,
+      "pages": ["Go in peace, and may the garden guide your steps."],
+      "choices": [],
+      "condition": null,
+      "events": [],
+      "isTerminal": true
+    }
+  }
+}

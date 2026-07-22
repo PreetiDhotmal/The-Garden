@@ -1,6 +1,22 @@
 spring:
   application:
     name: the-garden-backend
+  # No database is required yet at this stage of the project (no JPA
+  # repositories/entities are load-bearing for gameplay). Disabling
+  # these auto-configurations here is what lets the backend start with
+  # zero database setup. This is the DEFAULT (base) behavior; the dev
+  # and prod profiles each explicitly re-enable it below by resetting
+  # this list to empty, since dev (via docker-compose) and prod (via
+  # Railway/Neon) both do have a real Postgres available. Nothing about
+  # the JPA entity, repository, or Flyway migration is removed — they
+  # simply aren't activated unless a profile says so.
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
+      - org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration
+      - org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration
+      - org.springframework.boot.data.jpa.autoconfigure.DataJpaRepositoriesAutoConfiguration
+      - org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration
   jpa:
     open-in-view: false
     hibernate:
@@ -12,6 +28,19 @@ spring:
 app:
   cors:
     allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  youversion:
+    app-key: ${YVP_APP_KEY:}
+    base-url: ${YVP_BASE_URL:https://api.youversion.com}
+    default-bible-id: ${YVP_DEFAULT_BIBLE_ID:3034}
+    connect-timeout-millis: ${YVP_CONNECT_TIMEOUT_MILLIS:5000}
+    read-timeout-millis: ${YVP_READ_TIMEOUT_MILLIS:8000}
+  youversion-oauth:
+    client-id: ${YVP_APP_KEY:}
+    redirect-uri: ${YVP_OAUTH_REDIRECT_URI:http://localhost:5173/auth/youversion/callback}
+    authorize-url: ${YVP_AUTHORIZE_URL:https://api.youversion.com/auth/authorize}
+    token-url: ${YVP_TOKEN_URL:https://api.youversion.com/auth/token}
+    jwks-uri: ${YVP_JWKS_URI:https://api.youversion.com/.well-known/jwks.json}
+    issuer: ${YVP_ISSUER:https://api.youversion.com}
 
 springdoc:
   api-docs:

@@ -1,0 +1,8 @@
+export enum ItemCategory {
+  MATERIAL = "MATERIAL",
+  TOOL = "TOOL",
+  SCRIPTURE_FRAGMENT = "SCRIPTURE_FRAGMENT",
+  KEY = "KEY",
+  ARTIFACT = "ARTIFACT",
+  QUEST_ITEM = "QUEST_ITEM",
+}
