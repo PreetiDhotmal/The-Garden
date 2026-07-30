@@ -28,18 +28,51 @@ Players restore different parts of the garden while progressing through symbolic
 
 ---
 
-# ✨ Features
+## Features
 
-- 🌿 Beautiful stylized 3D environments
-- 👥 Local cooperative gameplay
+- 🌿 Browser-based 3D cooperative adventure
+- 🤝 Two-player teamwork and puzzle solving
+- 📖 Faith-inspired gameplay based on biblical virtues
+- 🌎 Beautiful interactive garden environment
 - 🎮 Third-person character controller
-- 🎭 Animated playable characters
-- 🧩 Interactive environmental puzzles
-- 🎵 Original ambient background music
-- 🌸 Dynamic vegetation and nature
-- 📖 Scripture-inspired storytelling
-- ❤️ Faith-centered relationship themes
-- ⚡ Browser-based experience
+- 🎭 Character selection system
+- 🎵 Ambient environmental audio
+- 🧩 Modular chapter-based puzzle system
+- 📖 Planned YouVersion Scripture integration
+- 🤖 Planned Gloo AI personalized faith reflection
+- 🏗️ Scalable architecture for future chapters
+
+---
+
+## Gameplay & Scripture Flow
+
+```text
+Players
+
+↓
+
+Solve Cooperative Puzzle
+
+↓
+
+Complete Chapter
+
+↓
+
+Faith Reflection
+
+↓
+
+Gloo AI Studio
+
+↓
+
+YouVersion Scripture
+
+↓
+
+Continue Journey
+```
 
 ---
 
@@ -280,6 +313,20 @@ audio/
 - Improved AI
 - Accessibility Features
 - Mobile Optimization
+
+---
+
+### API Roadmap
+
+Future development will expand Scripture integration through:
+
+- Personalized Scripture recommendations
+- Verse-of-the-Day experiences
+- Daily devotional challenges
+- Multiplayer faith reflection sessions
+- Reading plan synchronization
+- AI-generated encouragement after completing chapters
+- Progress tracking based on biblical virtues
 
 ---
 
