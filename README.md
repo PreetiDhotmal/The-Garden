@@ -145,29 +145,61 @@ http://localhost:5173
 
 ---
 
-# 📷 Screenshots
+# 🖼️ Featured Chapters
 
-## Garden Hub
-
-(Add Screenshot)
+The Garden is designed as a journey through ten symbolic chapters, each teaching a timeless biblical relationship virtue through cooperative gameplay and environmental puzzles.
 
 ---
 
-## Communication Chapter
+## 🌿 Level 1 – Communication
 
-(Add Screenshot)
+The first chapter introduces players to the importance of communication through cooperative puzzle solving and teamwork.
 
----
-
-## Trust Chapter
-
-(Add Screenshot)
+<p align="center">
+  <img src="assets/Level_01.png" width="100%" alt="Level 1 - Communication">
+</p>
 
 ---
 
-## Environment
+## 🤝 Level 2 – Trust
 
-(Add Screenshot)
+Players learn to depend on one another by overcoming challenges that require trust, coordination, and mutual support.
+
+<p align="center">
+  <img src="assets/Level_02.png" width="100%" alt="Level 2 - Trust">
+</p>
+
+---
+
+## ⏳ Level 3 – Patience
+
+This chapter encourages thoughtful decision-making and perseverance while working together to solve environmental challenges.
+
+<p align="center">
+  <img src="assets/Level_03.png" width="100%" alt="Level 3 - Patience">
+</p>
+
+---
+
+## ❤️ Level 4 – Forgiveness
+
+Players experience how forgiveness restores relationships by solving puzzles that symbolize reconciliation and compassion.
+
+<p align="center">
+  <img src="assets/Level_04.png" width="100%" alt="Level 4 - Forgiveness">
+</p>
+
+---
+
+## 🔥 Level 5 – Sacrifice
+
+The fifth chapter explores selflessness and serving one another through cooperative gameplay where success depends on putting the team first.
+
+<p align="center">
+  <img src="assets/Level_05.png" width="100%" alt="Level 5 - Sacrifice">
+</p>
+
+---
 
 ---
 
@@ -204,6 +236,28 @@ audio/
 - Mobile Optimization
 
 ---
+
+# 🌍 Future Scope
+
+The Garden is envisioned as the beginning of a larger collection of interactive, faith-inspired life journey experiences. While the current game focuses on building stronger relationships through biblical virtues and cooperative gameplay, future titles and expansions could explore other important stages of life.
+
+## Planned Future Experiences
+
+### 💍 Marriage Journey
+Expand the cooperative experience with additional chapters that help couples strengthen communication, trust, forgiveness, conflict resolution, and lifelong partnership through interactive gameplay.
+
+### 🏡 Building a Home Together
+A story-driven adventure where players work together to build a home, manage family responsibilities, make important life decisions, and grow together through teamwork and stewardship.
+
+### 👨‍👩‍👧 Parent–Child Journey
+An educational and interactive experience focused on strengthening relationships between parents and children through communication, understanding, patience, guidance, and mutual respect.
+
+### 👴 Aging with Grace
+A reflective journey exploring later stages of life, encouraging compassion, family connection, caregiving, wisdom, gratitude, and living with purpose during old age.
+
+---
+
+The long-term vision is to create a collection of meaningful, story-driven games that promote healthy relationships, empathy, cooperation, and faith-based values across different stages of life.
 
 # 👩‍💻 Author
 
