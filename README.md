@@ -43,6 +43,52 @@ Players restore different parts of the garden while progressing through symbolic
 
 ---
 
+# ✝️ Scripture Integration
+
+The Garden is built around the vision of bringing Scripture into an environment where people already spend time—gaming. Rather than creating another Bible application, the game naturally connects biblical wisdom with meaningful gameplay experiences.
+
+Each chapter is designed around a core biblical relationship virtue. Upon completing a chapter, players are encouraged to reflect on what they experienced before continuing their journey.
+
+### Planned API Integration
+
+This project is designed to integrate two core platform APIs provided by the hackathon:
+
+### 📖 YouVersion Platform API
+
+The YouVersion Platform API will provide Scripture passages, reading plans, and multilingual Bible content that correspond to the virtue explored in each chapter.
+
+Examples:
+
+| Chapter | Biblical Theme | Scripture |
+|----------|---------------|-----------|
+| Communication | Speaking with Love | Ephesians 4:29 |
+| Trust | Trusting God | Proverbs 3:5–6 |
+| Patience | Endurance | James 1:2–4 |
+| Forgiveness | Grace | Colossians 3:13 |
+| Sacrifice | Selfless Love | John 15:13 |
+
+Instead of interrupting gameplay, Scripture is presented as a meaningful reward and reflection after completing cooperative challenges.
+
+---
+
+### 🤖 Gloo AI Studio API
+
+The Gloo AI Studio API is intended to provide personalized, faith-centered reflections based on the player's journey.
+
+Rather than acting as a chatbot, the AI encourages players to reflect on the biblical virtue they practiced during gameplay and connects that experience with Scripture from the YouVersion Platform.
+
+This creates a natural gameplay → reflection → Scripture experience.
+
+---
+
+### Bringing Scripture into Gaming
+
+The Garden demonstrates how Scripture can become part of a player's emotional journey rather than existing as a separate application.
+
+By integrating biblical wisdom directly into cooperative gameplay, the project aligns with the hackathon vision of making Scripture present where people already are.
+
+---
+
 # 🌱 Current Prototype
 
 This submission includes:
