@@ -1,7 +1,7 @@
 # 🌿 The Garden
 
 <p align="center">
-  <img src="thumbnail.png" alt="The Garden" width="100%">
+  <img src="assets/Thumbnail.png" alt="The Garden" width="100%">
 </p>
 
 <h3 align="center">
