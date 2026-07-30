@@ -11,8 +11,8 @@ export interface ThirdPersonCameraConfig {
 }
 
 export const DEFAULT_THIRD_PERSON_CAMERA_CONFIG: ThirdPersonCameraConfig = {
-  minDistance: 2.5,
-  maxDistance: 8,
+  minDistance: 2,
+  maxDistance: 5.5,
   minPitchRadians: -Math.PI / 6,
   maxPitchRadians: Math.PI / 3,
   rotationSmoothing: 12,
@@ -135,5 +135,20 @@ export class CameraOrbitState {
 
   getConfig(): ThirdPersonCameraConfig {
     return this.config;
+  }
+
+  /** For save/load — captures the target (not smoothed) orbit, since that's what the player actually set. */
+  getState(): OrbitSnapshot {
+    return { yaw: this.targetYaw, pitch: this.targetPitch, distance: this.targetDistance };
+  }
+
+  /** For save/load — restores both target and current orbit to the saved values, so there's no smoothing "catch-up" animation on load. */
+  restoreState(state: OrbitSnapshot): void {
+    this.targetYaw = state.yaw;
+    this.targetPitch = state.pitch;
+    this.targetDistance = state.distance;
+    this.currentYaw = state.yaw;
+    this.currentPitch = state.pitch;
+    this.currentDistance = state.distance;
   }
 }

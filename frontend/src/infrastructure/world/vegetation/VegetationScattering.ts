@@ -19,7 +19,7 @@ export interface ScatterVegetationOptions {
   readonly maxAttemptsPerInstance?: number;
 }
 
-function mulberry32(seed: number): () => number {
+export function mulberry32(seed: number): () => number {
   let state = seed;
   return () => {
     state |= 0;

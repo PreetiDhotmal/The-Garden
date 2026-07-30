@@ -19,10 +19,14 @@ const SAMPLE_SAVE: PlayerSave = {
     unlockedWorldIds: [],
     playerPosition: { x: 0, y: 0, z: 0 },
     playerYaw: 0,
+  cameraState: null,
   },
-  settings: { musicVolume: 0.8, sfxVolume: 0.8, selectedCharacterId: null },
+  settings: { musicVolume: 0.8, sfxVolume: 0.8, selectedCharacterId: null, difficulty: "normal" },
   npcStates: [],
   storyFlags: [],
+  totalPlaytimeSeconds: 0,
+  gardenRestoration: [],
+  currentChapterId: null,
 };
 
 describe("JsonPlayerSaveCodec", () => {

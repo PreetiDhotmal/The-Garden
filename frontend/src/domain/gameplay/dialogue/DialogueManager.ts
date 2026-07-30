@@ -149,6 +149,12 @@ export class DialogueManager {
       case "CLAIM_QUEST_REWARD":
         this.eventBus.emit("dialogue:quest-reward-claim-requested", { questId: event.questId });
         break;
+      case "PROGRESS_OBJECTIVE":
+        this.eventBus.emit("dialogue:objective-progress-requested", {
+          questId: event.questId,
+          objectiveId: event.objectiveId,
+        });
+        break;
       default: {
         const exhaustiveCheck: never = event;
         throw new Error(`Unhandled dialogue event kind: ${String(exhaustiveCheck)}`);

@@ -1,4 +1,4 @@
-import { useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, type ReactNode } from "react";
 import { AssetRegistry } from "@/domain/engine/assets/AssetRegistry";
 import { TimeSystem } from "@/domain/engine/time/TimeSystem";
 import { createEngineEventBus } from "@/domain/engine/events/EngineEventBus";
@@ -46,5 +46,17 @@ export interface EngineProviderProps {
  */
 export function EngineProvider({ children }: EngineProviderProps) {
   const services = useMemo(() => createEngineServices(), []);
+
+  useEffect(() => {
+    return () => {
+      services.assetManager.dispose();
+      services.audioManager.dispose();
+    };
+    // Runs only on unmount — services is stable for this provider's
+    // whole lifetime (constructed once via useMemo(..., [])), so
+    // there's no meaningful re-run case to guard against here.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return <EngineContext.Provider value={services}>{children}</EngineContext.Provider>;
 }

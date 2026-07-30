@@ -9,13 +9,25 @@ import { useNotificationStore } from "../stores/notificationStore";
 import { usePopupStore } from "../stores/popupStore";
 
 export function GameplayEventBridge() {
-  const { eventBus, questRegistry, questEngine, scriptureRepository, scriptureProgressRef } =
+  const { eventBus, questRegistry, questEngine, scriptureRepository, scriptureProgressRef, saveManager } =
     useGameplay();
   const push = useNotificationStore((state) => state.push);
   const showAchievementPopup = usePopupStore((state) => state.showAchievementPopup);
   const showVersePopup = usePopupStore((state) => state.showVersePopup);
 
   useEffect(() => {
+    /**
+     * "Checkpoints" per Milestone 10's spec means autosave-on-event,
+     * not CheckpointManager (which tracks respawn spawn points, a
+     * different concern). Best-effort — a failed autosave shouldn't
+     * interrupt gameplay, the player can still Save manually.
+     */
+    const autosave = () => {
+      void saveManager.saveToStorage().catch(() => {
+        // Best-effort.
+      });
+    };
+
     const unsubscribes = [
       onQuestStarted(eventBus, (questId) => {
         const quest = questRegistry.has(questId) ? questRegistry.get(questId) : null;
@@ -24,15 +36,23 @@ export function GameplayEventBridge() {
       onQuestCompleted(eventBus, (questId) => {
         const quest = questRegistry.has(questId) ? questRegistry.get(questId) : null;
         push(`Quest completed: ${quest?.title ?? questId}`);
+        autosave();
       }),
       onCollectiblePicked(eventBus, (_collectibleId, category) => {
         push(`Picked up a ${category.toLowerCase()}.`);
+        autosave();
       }),
       onPlayerLeveledUp(eventBus, (newLevel) => {
         push(`Level up! You are now level ${String(newLevel)}.`);
       }),
       onAchievementUnlocked(eventBus, (achievementId) => {
         showAchievementPopup(achievementId);
+      }),
+      eventBus.on("quest:accepted", () => {
+        autosave();
+      }),
+      eventBus.on("scripture:collected", () => {
+        autosave();
       }),
 
       // Milestone 7: DialogueManager only ever *requests* these actions
@@ -55,6 +75,15 @@ export function GameplayEventBridge() {
         const quest = questRegistry.get(questId);
         if (quest.status === QuestStatus.COMPLETED) {
           questEngine.claimReward(questId);
+        }
+      }),
+      eventBus.on("dialogue:objective-progress-requested", ({ questId, objectiveId }) => {
+        if (!questRegistry.has(questId)) {
+          return;
+        }
+        const quest = questRegistry.get(questId);
+        if (quest.status === QuestStatus.ACTIVE) {
+          questEngine.progressObjective(questId, objectiveId, 1);
         }
       }),
       eventBus.on("dialogue:scripture-display-requested", ({ referenceKey }) => {
@@ -85,6 +114,7 @@ export function GameplayEventBridge() {
     questEngine,
     scriptureRepository,
     scriptureProgressRef,
+    saveManager,
     push,
     showAchievementPopup,
     showVersePopup,

@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
 import type { CharacterEntity } from "@/domain/character/CharacterEntity";
+import { useDebugSettingsStore } from "@/presentation/engine/stores/debugSettingsStore";
 
 /**
  * CharacterEntity is a plain mutable class (no observable/store), so
@@ -21,6 +22,12 @@ export interface CharacterDebugPanelProps {
 export function CharacterDebugPanel({ entity }: CharacterDebugPanelProps) {
   // Re-renders every animation frame by re-subscribing each time — a deliberate, simple polling pattern for a dev tool.
   useSyncExternalStore(subscribeToNextFrame, () => performance.now());
+
+  const isDebugPanelOpen = useDebugSettingsStore((state) => state.isPanelOpen);
+
+  if (!import.meta.env.DEV || !isDebugPanelOpen) {
+    return null;
+  }
 
   const position = entity.getPosition();
   const velocity = entity.getVelocity();

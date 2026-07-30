@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createQuest } from "./Quest";
-import { createQuestObjective } from "./QuestObjective";
+import { createQuestObjective, ObjectivePriority } from "./QuestObjective";
 import { QuestType, QuestStatus } from "./QuestTypes";
 import { createRewardBundle } from "@/domain/gameplay/reward/RewardBundle";
 import { applyQuestSave, toQuestSave } from "./QuestSaveMapper";
@@ -77,6 +77,10 @@ describe("QuestSaveMapper", () => {
       currentCount: 1,
       objectiveType: firstObjective.objectiveType,
       targetId: null,
+      priority: ObjectivePriority.PRIMARY,
+      isHidden: false,
+      dependsOnObjectiveIds: [],
+      timeLimitSeconds: null,
     };
     const save = toQuestSave({ ...freshQuest, objectives: [staleObjective] });
 

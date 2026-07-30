@@ -6,9 +6,16 @@ export interface PreloadState {
   readonly total: number;
   readonly isComplete: boolean;
   readonly error: string | null;
+  readonly currentAssetId: string | null;
 }
 
-const INITIAL_STATE: PreloadState = { loaded: 0, total: 0, isComplete: false, error: null };
+const INITIAL_STATE: PreloadState = {
+  loaded: 0,
+  total: 0,
+  isComplete: false,
+  error: null,
+  currentAssetId: null,
+};
 
 /**
  * Preloads the given asset ids on mount and tracks aggregate progress
@@ -20,10 +27,16 @@ export function useAssetPreloader(assetIds: readonly string[]): PreloadState {
   const [state, setState] = useState<PreloadState>(INITIAL_STATE);
 
   useEffect(() => {
-    setState({ loaded: 0, total: assetIds.length, isComplete: assetIds.length === 0, error: null });
+    setState({
+      loaded: 0,
+      total: assetIds.length,
+      isComplete: assetIds.length === 0,
+      error: null,
+      currentAssetId: null,
+    });
 
-    const unsubscribeProgress = eventBus.on("asset:preload-progress", ({ loaded, total }) => {
-      setState((previous) => ({ ...previous, loaded, total }));
+    const unsubscribeProgress = eventBus.on("asset:preload-progress", ({ loaded, total, assetId }) => {
+      setState((previous) => ({ ...previous, loaded, total, currentAssetId: assetId }));
     });
     const unsubscribeCompleted = eventBus.on("asset:preload-completed", () => {
       setState((previous) => ({ ...previous, isComplete: true }));

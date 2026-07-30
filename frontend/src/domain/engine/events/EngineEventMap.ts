@@ -16,7 +16,7 @@ export interface EngineEventMap {
   "asset:load-progress": { descriptor: AssetDescriptor; loadedBytes: number; totalBytes: number };
   "asset:load-completed": { descriptor: AssetDescriptor };
   "asset:load-failed": { descriptor: AssetDescriptor; error: string };
-  "asset:preload-progress": { loaded: number; total: number };
+  "asset:preload-progress": { loaded: number; total: number; assetId: string };
   "asset:preload-completed": Record<string, never>;
 
   "scene:transition-started": { fromSceneId: string | null; toSceneId: string };

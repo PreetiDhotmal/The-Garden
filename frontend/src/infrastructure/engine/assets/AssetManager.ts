@@ -81,12 +81,27 @@ export class AssetManager {
   }
 
   /** Loads every asset matching the given ids, reporting aggregate progress. */
+  /**
+   * Deliberately never rejects, even if every single asset in the
+   * batch fails — a loading screen gating on "preload finished" must
+   * always be able to finish, or it hangs forever. Per-asset success/
+   * failure is still fully visible via the asset:load-completed /
+   * asset:load-failed events this already emits; preload() itself
+   * only promises "I attempted every id and reported on each one."
+   */
   async preload(ids: readonly string[]): Promise<void> {
     this.loadingManager.beginBatch(ids.length);
-    await Promise.all(
+    await Promise.allSettled(
       ids.map(async (id) => {
-        await this.load(id);
-        this.loadingManager.reportItemLoaded();
+        try {
+          await this.load(id);
+        } catch {
+          // Already reported via asset:load-failed inside loadWithRetry —
+          // swallowed here only so this item still counts toward the
+          // batch's completion instead of leaving it permanently stuck.
+        } finally {
+          this.loadingManager.reportItemLoaded(id);
+        }
       })
     );
   }
@@ -102,6 +117,24 @@ export class AssetManager {
 
   evict(id: string): void {
     this.cache.evict(id);
+  }
+
+  /**
+   * Releases every cached resource this manager holds. Intended for
+   * EngineProvider to call on unmount — without this, every route
+   * navigation leaked whatever the previous route had loaded (the
+   * cache had no owner responsible for freeing it). Genuinely
+   * disposable resources (textures, audio buffers that implement
+   * `.dispose()`) are freed; resources this cache can't determine how
+   * to free (see AssetCache's own isDisposable check) are still
+   * dropped from the map so they become eligible for JS garbage
+   * collection, even though their own internal GPU buffers (if any)
+   * won't be explicitly released — a real, stated limitation, not
+   * something this method claims to fully solve.
+   */
+  dispose(): void {
+    this.cache.clear();
+    this.inFlightLoads.clear();
   }
 
   private async loadWithRetry(descriptor: AssetDescriptor, attempt = 0): Promise<unknown> {

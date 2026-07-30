@@ -90,4 +90,59 @@ describe("MovementStateMachine", () => {
     const resumed = machine.update(context({ isGrounded: true, horizontalSpeed: 2 }), tuning, 0.1);
     expect(resumed).toBe(CharacterState.WALKING);
   });
+
+  describe("hysteresis (regression coverage for animation stutter)", () => {
+    it("does not flip-flop between IDLE and WALKING when horizontalSpeed hovers exactly at idleSpeedThreshold", () => {
+      const machine = new MovementStateMachine();
+      // Establish WALKING with a speed clearly past the widened
+      // idle-exit threshold (0.1 * 1.5 = 0.15) — starting from IDLE,
+      // 0.1 alone correctly stays IDLE under hysteresis.
+      expect(machine.update(context({ horizontalSpeed: 0.2 }), tuning, 0.016)).toBe(
+        CharacterState.WALKING
+      );
+      // Now already WALKING: speed noise oscillating right at the base
+      // threshold (0.1) must NOT bounce back to IDLE — without
+      // hysteresis this would flip every frame, each flip interrupting
+      // the animation crossfade.
+      for (let i = 0; i < 10; i += 1) {
+        const speed = i % 2 === 0 ? 0.09 : 0.11;
+        expect(machine.update(context({ horizontalSpeed: speed }), tuning, 0.016)).toBe(
+          CharacterState.WALKING
+        );
+      }
+    });
+
+    it("does not flip-flop between WALKING and RUNNING when horizontalSpeed hovers exactly at runSpeedThreshold", () => {
+      const machine = new MovementStateMachine();
+      machine.update(context({ horizontalSpeed: 2 }), tuning, 0.016); // establish WALKING first
+      expect(machine.update(context({ horizontalSpeed: 3.5 }), tuning, 0.016)).toBe(
+        CharacterState.RUNNING
+      );
+      for (let i = 0; i < 10; i += 1) {
+        const speed = i % 2 === 0 ? 3.4 : 3.6;
+        expect(machine.update(context({ horizontalSpeed: speed }), tuning, 0.016)).toBe(
+          CharacterState.RUNNING
+        );
+      }
+    });
+
+    it("still genuinely transitions IDLE -> WALKING -> RUNNING -> WALKING -> IDLE given decisive (non-boundary) speed changes", () => {
+      const machine = new MovementStateMachine();
+      expect(machine.update(context({ horizontalSpeed: 0 }), tuning, 0.016)).toBe(
+        CharacterState.IDLE
+      );
+      expect(machine.update(context({ horizontalSpeed: 2 }), tuning, 0.016)).toBe(
+        CharacterState.WALKING
+      );
+      expect(machine.update(context({ horizontalSpeed: 5 }), tuning, 0.016)).toBe(
+        CharacterState.RUNNING
+      );
+      expect(machine.update(context({ horizontalSpeed: 1 }), tuning, 0.016)).toBe(
+        CharacterState.WALKING
+      );
+      expect(machine.update(context({ horizontalSpeed: 0 }), tuning, 0.016)).toBe(
+        CharacterState.IDLE
+      );
+    });
+  });
 });

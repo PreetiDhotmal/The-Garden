@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { WorldManager } from "@/infrastructure/world/WorldManager";
+import { useDebugSettingsStore } from "@/presentation/engine/stores/debugSettingsStore";
 
 export interface WorldDebugPanelProps {
   readonly worldManager: WorldManager;
@@ -22,6 +23,12 @@ export function WorldDebugPanel({ worldManager }: WorldDebugPanelProps) {
       window.clearInterval(interval);
     };
   }, []);
+
+  const isDebugPanelOpen = useDebugSettingsStore((state) => state.isPanelOpen);
+
+  if (!import.meta.env.DEV || !isDebugPanelOpen) {
+    return null;
+  }
 
   const streamedInRegions = worldManager.streamingCoordinator.getStreamedInRegionIds();
   const insideTriggers = worldManager.triggerVolumeManager.listInside();

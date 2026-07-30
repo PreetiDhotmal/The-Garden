@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
-import type { Mesh } from "three";
+import { SphereGeometry, type Mesh } from "three";
 import {
   InteractionPriority,
   InteractionTrigger,
@@ -17,6 +17,16 @@ export interface InteractableObjectProps {
   readonly canInteract?: () => boolean;
   readonly onInteract: () => void;
 }
+
+/**
+ * Every InteractableObject marker uses the identical [0.4, 24, 24]
+ * sphere — created once here and shared (via <primitive>) rather than
+ * each of the dozens of simultaneously-mounted instances across a
+ * scene (puzzle switches, levers, digit posts, NPCs, scripture
+ * stones) creating its own separate 576-vertex geometry. Never
+ * mutated per-instance, so sharing is safe.
+ */
+const SHARED_MARKER_GEOMETRY = new SphereGeometry(0.4, 24, 24);
 
 /**
  * Any mesh wrapped in this component becomes interactable — this is
@@ -67,8 +77,7 @@ export function InteractableObject({
   }, [id, interactionManager, promptText, radius, worldPosition]);
 
   return (
-    <mesh ref={meshRef} position={position} castShadow>
-      <sphereGeometry args={[0.4, 24, 24]} />
+    <mesh ref={meshRef} position={position} geometry={SHARED_MARKER_GEOMETRY} castShadow>
       <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.4} roughness={0.3} />
     </mesh>
   );

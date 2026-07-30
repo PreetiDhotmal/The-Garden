@@ -17,6 +17,7 @@ import type { StoryFlags } from "@/domain/gameplay/progression/StoryFlags";
 import type { WorldProgressionManager } from "@/domain/gameplay/progression/WorldProgressionManager";
 import type { SaveManager } from "@/infrastructure/gameplay/save/SaveManager";
 import type { WorldSaveContext } from "@/infrastructure/gameplay/save/SaveManager";
+import type { SettingsSave } from "@/domain/gameplay/save/PlayerSave";
 
 export interface GameplayServices {
   readonly eventBus: GameplayEventBus;
@@ -40,6 +41,8 @@ export interface GameplayServices {
   readonly saveManager: SaveManager;
   /** SaveManager's world/player queries are deferred until a world route provides real implementations — set .current here once the world/player entity exist. */
   readonly worldSaveContextRef: { current: WorldSaveContext };
+  /** SaveManager reads this synchronously when Save is pressed — GameplayProvider keeps it synced to the live settings/character-selection stores. */
+  readonly settingsRef: { current: SettingsSave };
 }
 
 export const GameplayContext = createContext<GameplayServices | null>(null);

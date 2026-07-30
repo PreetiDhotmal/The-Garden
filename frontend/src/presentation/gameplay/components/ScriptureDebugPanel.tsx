@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useGameplay } from "@/presentation/gameplay/hooks/useGameplay";
 import { ScriptureRepositoryImpl } from "@/infrastructure/gameplay/scripture/ScriptureRepositoryImpl";
+import { useDebugSettingsStore } from "@/presentation/engine/stores/debugSettingsStore";
 
 /**
  * Dev-only. Reads directly off ScriptureRepositoryImpl's extra
@@ -56,6 +57,12 @@ export function ScriptureDebugPanel() {
   }, [isRepositoryImpl, scriptureRepository]);
 
   const usingMock = import.meta.env.VITE_USE_MOCK_SCRIPTURE === "true";
+
+  const isDebugPanelOpen = useDebugSettingsStore((state) => state.isPanelOpen);
+
+  if (!import.meta.env.DEV || !isDebugPanelOpen) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col gap-1 rounded-md border border-garden-700 bg-black/70 p-3 font-mono text-xs text-light-divine">

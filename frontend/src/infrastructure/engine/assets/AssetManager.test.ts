@@ -121,14 +121,65 @@ describe("AssetManager", () => {
     ]);
     const eventBus = createEngineEventBus();
     const manager = new AssetManager(registry, eventBus);
-    const progressEvents: Array<{ loaded: number; total: number }> = [];
+    const progressEvents: Array<{ loaded: number; total: number; assetId: string }> = [];
     eventBus.on("asset:preload-progress", (payload) => progressEvents.push(payload));
     const completed = vi.fn();
     eventBus.on("asset:preload-completed", completed);
 
     await manager.preload(["a", "b"]);
 
-    expect(progressEvents.at(-1)).toEqual({ loaded: 2, total: 2 });
+    expect(progressEvents).toHaveLength(2);
+    const lastEvent = progressEvents.at(-1);
+    expect(lastEvent?.loaded).toBe(2);
+    expect(lastEvent?.total).toBe(2);
+    expect(progressEvents.map((event) => event.assetId).sort()).toEqual(["a", "b"]);
+  });
+
+  it("preload completes even when one asset in the batch fails every retry attempt — it must never hang the batch on a single failure", async () => {
+    mockedLoadTexture.mockImplementation((url: string) => {
+      if (url === "/b.png") {
+        return Promise.reject(new Error("network error"));
+      }
+      return Promise.resolve(fakeTexture());
+    });
+    const registry = new AssetRegistry();
+    registry.registerAll([
+      createAssetDescriptor({ id: "a", type: AssetType.TEXTURE, url: "/a.png" }),
+      createAssetDescriptor({ id: "b", type: AssetType.TEXTURE, url: "/b.png" }),
+    ]);
+    const eventBus = createEngineEventBus();
+    const config = createAssetConfig({ retryAttempts: 0 });
+    const manager = new AssetManager(registry, eventBus, config);
+    const completed = vi.fn();
+    const failed = vi.fn();
+    eventBus.on("asset:preload-completed", completed);
+    eventBus.on("asset:load-failed", failed);
+
+    await expect(manager.preload(["a", "b"])).resolves.toBeUndefined();
+
     expect(completed).toHaveBeenCalledTimes(1);
+    expect(failed).toHaveBeenCalledTimes(1);
+    // The successfully-loaded asset is still genuinely cached, despite its sibling's failure.
+    expect(manager.isCached("a")).toBe(true);
+    expect(manager.isCached("b")).toBe(false);
+    expect(completed).toHaveBeenCalledTimes(1);
+  });
+
+  it("dispose() clears every cached resource — the fix for routes leaking the previous route's loaded assets", async () => {
+    mockedLoadTexture.mockResolvedValueOnce(fakeTexture());
+    const { manager } = buildManager();
+    await manager.load("grass");
+    expect(manager.isCached("grass")).toBe(true);
+
+    manager.dispose();
+
+    expect(manager.isCached("grass")).toBe(false);
+  });
+
+  it("dispose() does not throw when called on a manager that never loaded anything", () => {
+    const { manager } = buildManager();
+    expect(() => {
+      manager.dispose();
+    }).not.toThrow();
   });
 });

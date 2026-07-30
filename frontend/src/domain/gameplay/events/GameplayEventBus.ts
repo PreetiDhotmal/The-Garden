@@ -38,6 +38,7 @@ export interface GameplayEventMap {
   "inventory:item-removed": { itemId: string; quantity: number };
 
   "reward:granted": { rewardType: string; amount: number | null };
+  "save:completed": Record<string, never>;
 
   "player:leveled-up": { newLevel: number };
 
@@ -51,6 +52,31 @@ export interface GameplayEventMap {
   "dialogue:quest-offer-requested": { questId: string };
   "dialogue:scripture-display-requested": { referenceKey: string };
   "dialogue:quest-reward-claim-requested": { questId: string };
+  "dialogue:objective-progress-requested": { questId: string; objectiveId: string };
+
+  // --- Game framework events (Milestone: gameplay framework) ---
+  "game:state-changed": { from: string; to: string };
+  "chapter:unlocked": { chapterId: string };
+  "chapter:completed": { chapterId: string };
+  "level:started": { levelId: string };
+  "level:completed": { levelId: string };
+  "objective:completed": { objectiveId: string; levelId: string };
+  "garden:restored": { chapterId: string };
+  "reflection:opened": { levelId: string };
+  "reflection:closed": { levelId: string };
+  "checkpoint:reached": { checkpointId: string; levelId: string };
+  "player:respawned": { playerId: string; checkpointId: string };
+  "coop:player-joined": { playerId: string };
+  "coop:player-left": { playerId: string };
+  "transition:phase-changed": { phase: string };
+
+  // --- Cooperative puzzle framework (Milestone: Level 1 Communication) ---
+  /** A stage's objectives are all satisfied — the "success" reaction point. */
+  "puzzle:stage-completed": { levelId: string; stageId: string };
+  /** A player attempted the stage's mechanism incorrectly — deliberately NOT a failure/fail event: no punishment, just a fun, surprising, instantly-reset moment (Part 4). Audio/animation hooks react to this specifically, distinct from stage-completed. */
+  "puzzle:attempt-missed": { levelId: string; stageId: string };
+  /** Every stage in the level's sequence is complete. */
+  "puzzle:level-completed": { levelId: string };
 }
 
 export type GameplayEventName = keyof GameplayEventMap;

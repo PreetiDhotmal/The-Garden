@@ -36,9 +36,9 @@ export function PostProcessingStack({
       <Bloom
         key="bloom"
         mipmapBlur
-        luminanceThreshold={0.85}
+        luminanceThreshold={0.92}
         luminanceSmoothing={0.2}
-        intensity={0.6}
+        intensity={0.35}
       />
     ),
     <ToneMapping key="tonemap" mode={ToneMappingMode.ACES_FILMIC} />,

@@ -19,9 +19,9 @@ export class LoadingManager {
     this.loaded = 0;
   }
 
-  reportItemLoaded(): void {
+  reportItemLoaded(assetId: string): void {
     this.loaded += 1;
-    this.eventBus.emit("asset:preload-progress", { loaded: this.loaded, total: this.total });
+    this.eventBus.emit("asset:preload-progress", { loaded: this.loaded, total: this.total, assetId });
     if (this.loaded >= this.total) {
       this.eventBus.emit("asset:preload-completed", {});
     }

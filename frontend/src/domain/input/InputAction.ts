@@ -12,4 +12,7 @@ export enum InputAction {
   SPRINT = "SPRINT",
   JUMP = "JUMP",
   INTERACT = "INTERACT",
+  PAUSE = "PAUSE",
+  OPEN_JOURNAL = "OPEN_JOURNAL",
+  OPEN_INVENTORY = "OPEN_INVENTORY",
 }

@@ -1,5 +1,6 @@
 import type { AnimationClipRegistry } from "@/domain/character/animation/AnimationClipRegistry";
 import type { CharacterAnimationConfig } from "@/domain/character/animation/CharacterAnimationConfig";
+import { useDebugSettingsStore } from "@/presentation/engine/stores/debugSettingsStore";
 
 export interface AnimationDebugPanelProps {
   readonly clipRegistry: AnimationClipRegistry;
@@ -7,6 +8,12 @@ export interface AnimationDebugPanelProps {
 }
 
 export function AnimationDebugPanel({ clipRegistry, animationConfig }: AnimationDebugPanelProps) {
+  const isDebugPanelOpen = useDebugSettingsStore((state) => state.isPanelOpen);
+
+  if (!import.meta.env.DEV || !isDebugPanelOpen) {
+    return null;
+  }
+
   return (
     <div className="flex max-h-72 flex-col gap-2 overflow-y-auto rounded-md border border-garden-700 bg-black/70 p-3 font-mono text-xs text-light-divine">
       <div className="rounded bg-yellow-900/60 p-2 text-yellow-200">

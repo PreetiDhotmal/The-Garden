@@ -1,0 +1,71 @@
+{
+  "id": "dialogue:traveler-greeting",
+  "startNodeId": "greeting",
+  "nodesById": {
+    "greeting": {
+      "id": "greeting",
+      "speakerName": "A Traveler",
+      "portraitAssetId": null,
+      "pages": ["Please... I've had nothing to drink since dawn. Could you spare any water?"],
+      "choices": [
+        {
+          "id": "help",
+          "text": "Share your water with them.",
+          "targetNodeId": "helped",
+          "condition": "quest:quest:the-wilderness:ACTIVE"
+        },
+        {
+          "id": "ignore",
+          "text": "Keep walking.",
+          "targetNodeId": "ignored",
+          "condition": "quest:quest:the-wilderness:ACTIVE"
+        },
+        {
+          "id": "already-helped",
+          "text": "Safe travels.",
+          "targetNodeId": "farewell",
+          "condition": null
+        }
+      ],
+      "condition": null,
+      "events": [],
+      "isTerminal": false
+    },
+    "helped": {
+      "id": "helped",
+      "speakerName": "A Traveler",
+      "portraitAssetId": null,
+      "pages": ["Thank you, truly. Few would stop out here. May you find water when you need it most."],
+      "choices": [],
+      "condition": null,
+      "events": [
+        {
+          "kind": "PROGRESS_OBJECTIVE",
+          "questId": "quest:the-wilderness",
+          "objectiveId": "objective:the-wilderness:help-traveler"
+        }
+      ],
+      "isTerminal": true
+    },
+    "ignored": {
+      "id": "ignored",
+      "speakerName": "A Traveler",
+      "portraitAssetId": null,
+      "pages": ["...I understand. The desert makes everyone count their own water first."],
+      "choices": [],
+      "condition": null,
+      "events": [],
+      "isTerminal": true
+    },
+    "farewell": {
+      "id": "farewell",
+      "speakerName": "A Traveler",
+      "portraitAssetId": null,
+      "pages": ["Go well."],
+      "choices": [],
+      "condition": null,
+      "events": [],
+      "isTerminal": true
+    }
+  }
+}

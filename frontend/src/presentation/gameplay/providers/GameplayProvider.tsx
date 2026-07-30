@@ -1,4 +1,6 @@
-import { useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, type ReactNode } from "react";
+import { useSettingsStore } from "@/presentation/settings/settingsStore";
+import { useCharacterSelectionStore } from "@/presentation/character/stores/characterSelectionStore";
 import { createGameplayEventBus } from "@/domain/gameplay/events/GameplayEventBus";
 import { InteractionManager } from "@/domain/gameplay/interaction/InteractionManager";
 import { QuestRegistry } from "@/domain/gameplay/quest/QuestRegistry";
@@ -30,7 +32,12 @@ import { GameplayContext, type GameplayServices } from "./GameplayContext";
 
 export const SCRIPTURE_FRAGMENT_ITEM_ID = "item:scripture-fragment";
 
-const DEFAULT_SETTINGS: SettingsSave = { musicVolume: 0.8, sfxVolume: 0.8, selectedCharacterId: null };
+const DEFAULT_SETTINGS: SettingsSave = {
+  musicVolume: 0.8,
+  sfxVolume: 0.8,
+  selectedCharacterId: null,
+  difficulty: "normal",
+};
 
 /**
  * BackendScriptureProvider (-> our backend -> real YouVersion API) is
@@ -51,6 +58,14 @@ const NOOP_WORLD_SAVE_CONTEXT: WorldSaveContext = {
   getPlayerPosition: () => ({ x: 0, y: 0, z: 0 }),
   getPlayerYaw: () => 0,
   restorePlayerPosition: () => {
+    // No-op until a route provides a real implementation.
+  },
+  getCameraState: () => null,
+  restoreCameraState: () => {
+    // No-op until a route provides a real implementation.
+  },
+  getTotalPlaytimeSeconds: () => 0,
+  restoreTotalPlaytimeSeconds: () => {
     // No-op until a route provides a real implementation.
   },
 };
@@ -78,6 +93,14 @@ function createDeferredWorldSaveContext(): {
     getPlayerYaw: () => innerRef.current.getPlayerYaw(),
     restorePlayerPosition: (position, yaw) => {
       innerRef.current.restorePlayerPosition(position, yaw);
+    },
+    getCameraState: () => innerRef.current.getCameraState(),
+    restoreCameraState: (state) => {
+      innerRef.current.restoreCameraState(state);
+    },
+    getTotalPlaytimeSeconds: () => innerRef.current.getTotalPlaytimeSeconds(),
+    restoreTotalPlaytimeSeconds: (seconds) => {
+      innerRef.current.restoreTotalPlaytimeSeconds(seconds);
     },
   };
   return { innerRef, proxyContext };
@@ -169,6 +192,7 @@ function createGameplayServices(): GameplayServices {
     worldProgressionManager,
     saveManager,
     worldSaveContextRef,
+    settingsRef,
   };
 }
 
@@ -184,5 +208,25 @@ export interface GameplayProviderProps {
  */
 export function GameplayProvider({ children }: GameplayProviderProps) {
   const services = useMemo(() => createGameplayServices(), []);
+
+  const musicVolume = useSettingsStore((state) => state.musicVolume);
+  const sfxVolume = useSettingsStore((state) => state.sfxVolume);
+  const difficulty = useSettingsStore((state) => state.difficulty);
+  const selectedCharacterId = useCharacterSelectionStore((state) => state.selectedCharacterId);
+
+  /**
+   * settingsRef previously never updated past its hardcoded default —
+   * every save silently discarded the player's actual volume/
+   * character/difficulty choices and wrote the defaults back instead.
+   * SaveManager reads settingsRef.current synchronously at the moment
+   * Save is pressed (not reactively), so keeping it live via this
+   * effect — rather than making SaveManager itself store-aware, which
+   * would couple a plain infrastructure class to React — is the
+   * minimal, correct fix.
+   */
+  useEffect(() => {
+    services.settingsRef.current = { musicVolume, sfxVolume, selectedCharacterId, difficulty };
+  }, [services, musicVolume, sfxVolume, selectedCharacterId, difficulty]);
+
   return <GameplayContext.Provider value={services}>{children}</GameplayContext.Provider>;
 }

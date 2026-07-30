@@ -16,7 +16,10 @@ export class MouseInputSource implements InputSource {
   private lookDeltaY = 0;
   private zoomDelta = 0;
 
-  constructor(private readonly targetElement: HTMLElement) {}
+  constructor(
+    private readonly targetElement: HTMLElement,
+    private readonly sensitivityMultiplier = 1
+  ) {}
 
   attach(): void {
     document.addEventListener("mousemove", this.handleMouseMove);
@@ -45,8 +48,8 @@ export class MouseInputSource implements InputSource {
     if (document.pointerLockElement !== this.targetElement) {
       return;
     }
-    this.lookDeltaX += -event.movementX * LOOK_SENSITIVITY;
-    this.lookDeltaY += -event.movementY * LOOK_SENSITIVITY;
+    this.lookDeltaX += -event.movementX * LOOK_SENSITIVITY * this.sensitivityMultiplier;
+    this.lookDeltaY += -event.movementY * LOOK_SENSITIVITY * this.sensitivityMultiplier;
   };
 
   private handleWheel = (event: WheelEvent): void => {

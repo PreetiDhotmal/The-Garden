@@ -8,6 +8,7 @@ import { WorldUnlockViewerPanel } from "./WorldUnlockViewerPanel";
 import { EventLogPanel } from "./EventLogPanel";
 import { PlayerPositionPanel } from "./PlayerPositionPanel";
 import { SaveDataPanel } from "./SaveDataPanel";
+import { useDebugSettingsStore } from "@/presentation/engine/stores/debugSettingsStore";
 
 export interface GameplayDevToolsProps {
   readonly playerEntity: CharacterEntity | null;
@@ -30,6 +31,12 @@ const TABS: readonly { id: Tab; label: string }[] = [
 export function GameplayDevTools({ playerEntity, dialogueSnapshot }: GameplayDevToolsProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("quests");
+
+  const isDebugPanelOpen = useDebugSettingsStore((state) => state.isPanelOpen);
+
+  if (!import.meta.env.DEV || !isDebugPanelOpen) {
+    return null;
+  }
 
   return (
     <div className="pointer-events-auto fixed bottom-4 right-1/2 z-40 w-72 translate-x-1/2">

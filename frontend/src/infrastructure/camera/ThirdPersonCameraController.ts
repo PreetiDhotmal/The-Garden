@@ -35,6 +35,14 @@ export class ThirdPersonCameraController {
     this.orbit.applyZoomDelta(delta);
   }
 
+  getOrbitState() {
+    return this.orbit.getState();
+  }
+
+  restoreOrbitState(state: ReturnType<CameraOrbitState["getState"]>): void {
+    this.orbit.restoreState(state);
+  }
+
   update(targetPosition: Vector3Tuple, deltaSeconds: number): ThirdPersonCameraFrame {
     const config = this.orbit.getConfig();
     const pivot: Vector3Tuple = {

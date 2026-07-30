@@ -9,7 +9,8 @@ export interface DialogueChoice {
 export type DialogueEventKind =
   | { readonly kind: "OFFER_QUEST"; readonly questId: string }
   | { readonly kind: "SHOW_SCRIPTURE"; readonly referenceKey: string }
-  | { readonly kind: "CLAIM_QUEST_REWARD"; readonly questId: string };
+  | { readonly kind: "CLAIM_QUEST_REWARD"; readonly questId: string }
+  | { readonly kind: "PROGRESS_OBJECTIVE"; readonly questId: string; readonly objectiveId: string };
 
 export interface DialogueNode {
   readonly id: string;

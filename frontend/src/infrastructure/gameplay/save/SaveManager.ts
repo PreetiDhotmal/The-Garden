@@ -1,4 +1,6 @@
+import type { RestorationProfile } from "@/domain/game/RestorationProfile";
 import type { Vector3Tuple } from "@/domain/character/CharacterSpawnPoint";
+import type { CameraStateSave } from "@/domain/gameplay/save/PlayerSave";
 import type { RewardEngine } from "@/domain/gameplay/reward/RewardEngine";
 import type { Inventory } from "@/domain/gameplay/inventory/Inventory";
 import { serializeInventory } from "@/domain/gameplay/inventory/InventorySerializer";
@@ -18,6 +20,17 @@ export interface WorldSaveContext {
   getPlayerPosition: () => Vector3Tuple;
   getPlayerYaw: () => number;
   restorePlayerPosition: (position: Vector3Tuple, yaw: number) => void;
+  getCameraState: () => CameraStateSave | null;
+  restoreCameraState: (state: CameraStateSave) => void;
+  getTotalPlaytimeSeconds: () => number;
+  restoreTotalPlaytimeSeconds: (seconds: number) => void;
+  /** Gameplay framework milestone additions — optional so routes that don't yet use ChapterManager/GardenRestorationManager (Genesis Garden, Wilderness) need no changes at all; NOOP_WORLD_SAVE_CONTEXT supplies safe defaults. */
+  getGardenRestorationState?: () => readonly { zoneId: string; profile: RestorationProfile }[];
+  restoreGardenRestorationState?: (
+    state: readonly { zoneId: string; profile: RestorationProfile }[]
+  ) => void;
+  getCurrentChapterId?: () => string | null;
+  restoreCurrentChapterId?: (chapterId: string | null) => void;
 }
 
 /**
@@ -58,10 +71,14 @@ export class SaveManager {
         unlockedWorldIds: this.worldContext.getUnlockedWorldIds(),
         playerPosition: this.worldContext.getPlayerPosition(),
         playerYaw: this.worldContext.getPlayerYaw(),
+        cameraState: this.worldContext.getCameraState(),
       },
       settings: this.settingsRef.current,
       npcStates: this.npcManager.snapshotState(),
       storyFlags: this.storyFlags.list(),
+      totalPlaytimeSeconds: this.worldContext.getTotalPlaytimeSeconds(),
+      gardenRestoration: this.worldContext.getGardenRestorationState?.() ?? [],
+      currentChapterId: this.worldContext.getCurrentChapterId?.() ?? null,
     };
   }
 
@@ -84,6 +101,19 @@ export class SaveManager {
    * status/progress, so a content change between sessions can't
    * corrupt anything.
    */
+  /**
+   * Clears the persisted save AND the current in-memory StoryFlags -
+   * both matter. Clearing only the persisted save would leave a
+   * still-running session's live StoryFlags (e.g. "Puzzle 1 complete"
+   * from earlier in this same session) untouched, so a level route
+   * checking `storyFlags.has(...)` directly (not only via a fresh
+   * loadFromStorage() call) would still see stale progress.
+   */
+  async clearSave(): Promise<void> {
+    await this.saveRepository.clear();
+    this.storyFlags.restore([]);
+  }
+
   restoreFromSnapshot(save: PlayerSave): void {
     this.rewardEngine.restoreTotals(save.progress);
     this.inventory.restoreSlots(save.inventory.slots);
@@ -105,6 +135,12 @@ export class SaveManager {
     this.npcManager.restoreState(save.npcStates);
     this.storyFlags.restore(save.storyFlags);
     this.worldContext.restorePlayerPosition(save.world.playerPosition, save.world.playerYaw);
+    if (save.world.cameraState) {
+      this.worldContext.restoreCameraState(save.world.cameraState);
+    }
+    this.worldContext.restoreTotalPlaytimeSeconds(save.totalPlaytimeSeconds);
+    this.worldContext.restoreGardenRestorationState?.(save.gardenRestoration);
+    this.worldContext.restoreCurrentChapterId?.(save.currentChapterId);
     this.settingsRef.current = save.settings;
   }
 }

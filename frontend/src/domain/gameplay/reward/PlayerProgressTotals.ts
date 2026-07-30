@@ -12,7 +12,7 @@ export const INITIAL_PLAYER_PROGRESS: PlayerProgressTotals = {
   level: 1,
 };
 
-const EXPERIENCE_PER_LEVEL = 100;
+export const EXPERIENCE_PER_LEVEL = 100;
 
 /** Simple linear XP curve: level N requires N * EXPERIENCE_PER_LEVEL total experience. */
 export function levelForExperience(experience: number): number {

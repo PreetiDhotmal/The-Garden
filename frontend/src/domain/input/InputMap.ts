@@ -17,6 +17,9 @@ export const DEFAULT_KEYBOARD_BINDINGS: readonly InputBinding[] = [
   createInputBinding(InputAction.SPRINT, "keyboard", "ShiftLeft"),
   createInputBinding(InputAction.JUMP, "keyboard", "Space"),
   createInputBinding(InputAction.INTERACT, "keyboard", "KeyE"),
+  createInputBinding(InputAction.PAUSE, "keyboard", "Escape"),
+  createInputBinding(InputAction.OPEN_JOURNAL, "keyboard", "KeyJ"),
+  createInputBinding(InputAction.OPEN_INVENTORY, "keyboard", "KeyI"),
 ];
 
 export const DEFAULT_GAMEPAD_BINDINGS: readonly InputBinding[] = [
@@ -68,4 +71,60 @@ export class InputMap {
 
 export function createDefaultInputMap(): InputMap {
   return new InputMap([...DEFAULT_KEYBOARD_BINDINGS, ...DEFAULT_GAMEPAD_BINDINGS]);
+}
+
+/**
+ * Split-screen co-op bindings — deliberately NOT the same as
+ * createDefaultInputMap(), since the single-player default binds
+ * both WASD and arrow keys to movement (a convenience that would
+ * collide with Player Two owning the arrow keys here). Player One
+ * gets WASD only; shared UI actions (pause/journal/inventory) are
+ * bound on both players' maps since either partner should be able to
+ * open them.
+ */
+export const PLAYER_ONE_KEYBOARD_BINDINGS: readonly InputBinding[] = [
+  createInputBinding(InputAction.MOVE_FORWARD, "keyboard", "KeyW"),
+  createInputBinding(InputAction.MOVE_BACKWARD, "keyboard", "KeyS"),
+  createInputBinding(InputAction.MOVE_LEFT, "keyboard", "KeyA"),
+  createInputBinding(InputAction.MOVE_RIGHT, "keyboard", "KeyD"),
+  createInputBinding(InputAction.SPRINT, "keyboard", "ShiftLeft"),
+  createInputBinding(InputAction.JUMP, "keyboard", "Space"),
+  createInputBinding(InputAction.INTERACT, "keyboard", "KeyE"),
+  createInputBinding(InputAction.PAUSE, "keyboard", "Escape"),
+  createInputBinding(InputAction.OPEN_JOURNAL, "keyboard", "KeyJ"),
+  createInputBinding(InputAction.OPEN_INVENTORY, "keyboard", "KeyI"),
+];
+
+export const PLAYER_TWO_KEYBOARD_BINDINGS: readonly InputBinding[] = [
+  createInputBinding(InputAction.MOVE_FORWARD, "keyboard", "ArrowUp"),
+  createInputBinding(InputAction.MOVE_BACKWARD, "keyboard", "ArrowDown"),
+  createInputBinding(InputAction.MOVE_LEFT, "keyboard", "ArrowLeft"),
+  createInputBinding(InputAction.MOVE_RIGHT, "keyboard", "ArrowRight"),
+  createInputBinding(InputAction.SPRINT, "keyboard", "ShiftRight"),
+  createInputBinding(InputAction.JUMP, "keyboard", "Enter"),
+  createInputBinding(InputAction.INTERACT, "keyboard", "Slash"),
+  createInputBinding(InputAction.PAUSE, "keyboard", "Escape"),
+  createInputBinding(InputAction.OPEN_JOURNAL, "keyboard", "KeyJ"),
+  createInputBinding(InputAction.OPEN_INVENTORY, "keyboard", "KeyI"),
+];
+
+export function createPlayerOneInputMap(): InputMap {
+  return new InputMap([...PLAYER_ONE_KEYBOARD_BINDINGS, ...DEFAULT_GAMEPAD_BINDINGS]);
+}
+
+export function createPlayerTwoInputMap(): InputMap {
+  return new InputMap(PLAYER_TWO_KEYBOARD_BINDINGS);
+}
+
+/** Applies persisted rebind overrides (action -> new keyboard code) on top of the defaults. */
+export function createInputMapWithOverrides(
+  keyboardOverrides: Readonly<Partial<Record<InputAction, string>>>
+): InputMap {
+  const map = createDefaultInputMap();
+  for (const [action, physicalInput] of Object.entries(keyboardOverrides)) {
+    if (physicalInput) {
+      map.rebind(action as InputAction, "keyboard", physicalInput);
+    }
+  }
+  return map;
 }

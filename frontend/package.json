@@ -4,6 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "generate:environment-manifest": "node scripts/generateEnvironmentAssetManifest.mjs",
+    "predev": "pnpm run generate:environment-manifest",
+    "prebuild": "pnpm run generate:environment-manifest",
+    "pretypecheck": "pnpm run generate:environment-manifest",
+    "pretest": "pnpm run generate:environment-manifest",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
