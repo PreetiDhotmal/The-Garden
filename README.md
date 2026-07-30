@@ -373,4 +373,6 @@ Created for the Kaggle Game Arena Challenge.
 
 Special thanks to the open-source community and the tools that made this project possible.
 
+The Garden is currently an active work in progress. Developed independently by a single developer, this submission represents the foundation of a much larger vision. While the current prototype demonstrates the core gameplay systems, technical architecture, and overall direction of the project, development is ongoing as additional chapters, gameplay mechanics, and planned Scripture integrations continue to be expanded.
+
 > *Growing Together in Faith.*
