@@ -1,0 +1,11 @@
+export type GameFlowScreen =
+  | "SPLASH"
+  | "STUDIO_LOGO"
+  | "GARDEN_LOGO"
+  | "MAIN_MENU"
+  | "SETTINGS"
+  | "CREDITS"
+  | "INTRO_CUTSCENE"
+  | "CHARACTER_SELECT"
+  | "DIFFICULTY_SELECT"
+  | "ENTERING_WORLD";

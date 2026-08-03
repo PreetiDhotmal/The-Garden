@@ -13,6 +13,7 @@ import { GameCanvas } from "@/presentation/engine/components/GameCanvas";
 import { SplitScreenRenderer } from "@/presentation/engine/components/SplitScreenRenderer";
 import { TrustLevelScene } from "@/presentation/levels/trust/TrustLevelScene";
 import { SceneErrorBoundary } from "@/presentation/engine/components/SceneErrorBoundary";
+import { ScreenFadeOverlay } from "@/presentation/engine/components/ScreenFadeOverlay";
 import {
   TRUST_LEVEL_ID,
   buildHiddenBridgeStage,
@@ -82,6 +83,8 @@ function TrustLevelContent() {
   const groundHeightRef = useRef<((x: number, z: number) => number) | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [hasFocus, setHasFocus] = useState(false);
+  const [isFadingIn, setIsFadingIn] = useState(true);
+  const [isFadingOutToHub, setIsFadingOutToHub] = useState(false);
   const [levelState, setLevelState] = useState(PuzzleState.NOT_STARTED);
   const [, forceRerender] = useState(0);
   const playerBTeleportRequestRef = useRef<TeleportRequest | null>(null);
@@ -400,11 +403,29 @@ function TrustLevelContent() {
           Entering the Forest together…
         </div>
       )}
-      {levelState === PuzzleState.COMPLETE && (
+      {isFadingIn && (
+        <ScreenFadeOverlay
+          direction="IN"
+          durationSeconds={0.6}
+          onComplete={() => {
+            setIsFadingIn(false);
+          }}
+        />
+      )}
+      {isFadingOutToHub && (
+        <ScreenFadeOverlay
+          direction="OUT"
+          durationSeconds={0.6}
+          onComplete={() => {
+            void navigate("/hub");
+          }}
+        />
+      )}
+      {levelState === PuzzleState.COMPLETE && !isFadingOutToHub && (
         <ReflectionScreen
           levelId={TRUST_LEVEL_ID}
           onContinue={() => {
-            void navigate("/hub");
+            setIsFadingOutToHub(true);
           }}
         />
       )}

@@ -1,0 +1,81 @@
+{
+  "id": "dialogue:guide-greeting",
+  "startNodeId": "greeting",
+  "nodesById": {
+    "greeting": {
+      "id": "greeting",
+      "speakerName": "The Guide",
+      "portraitAssetId": null,
+      "pages": [
+        "You've crossed out of the Garden. Out here, faith is tested, not given freely.",
+        "The wilderness will teach you what comfort never could — but you won't walk it alone."
+      ],
+      "choices": [
+        {
+          "id": "ask-quest-not-started",
+          "text": "What must I do?",
+          "targetNodeId": "offer-quest",
+          "condition": "quest:quest:the-wilderness:AVAILABLE"
+        },
+        {
+          "id": "ask-quest-in-progress",
+          "text": "How am I doing?",
+          "targetNodeId": "check-progress",
+          "condition": "quest:quest:the-wilderness:ACTIVE"
+        },
+        {
+          "id": "ask-quest-done",
+          "text": "I've reached the mountain.",
+          "targetNodeId": "claim-reward",
+          "condition": "quest:quest:the-wilderness:COMPLETED"
+        },
+        { "id": "leave", "text": "Farewell.", "targetNodeId": "farewell", "condition": null }
+      ],
+      "condition": null,
+      "events": [],
+      "isTerminal": false
+    },
+    "offer-quest": {
+      "id": "offer-quest",
+      "speakerName": "The Guide",
+      "portraitAssetId": null,
+      "pages": [
+        "Find water before thirst finds you. Gather manna where it falls. Resist what tempts you. Help who you meet. Read what is written. Then climb."
+      ],
+      "choices": [],
+      "condition": null,
+      "events": [{ "kind": "OFFER_QUEST", "questId": "quest:the-wilderness" }],
+      "isTerminal": true
+    },
+    "check-progress": {
+      "id": "check-progress",
+      "speakerName": "The Guide",
+      "portraitAssetId": null,
+      "pages": ["Keep going. The mountain doesn't move, but neither does the sun."],
+      "choices": [],
+      "condition": null,
+      "events": [],
+      "isTerminal": true
+    },
+    "claim-reward": {
+      "id": "claim-reward",
+      "speakerName": "The Guide",
+      "portraitAssetId": null,
+      "pages": ["You made it through. Not unchanged — that was the point."],
+      "choices": [],
+      "condition": null,
+      "events": [{ "kind": "CLAIM_QUEST_REWARD", "questId": "quest:the-wilderness" }],
+      "isTerminal": true
+    },
+    "farewell": {
+      "id": "farewell",
+      "speakerName": "The Guide",
+      "portraitAssetId": null,
+      "pages": ["Walk carefully. The sand remembers nothing, but it forgives even less."],
+      "choices": [],
+      "condition": null,
+      "events": [],
+      "isTerminal": true
+    }
+  }
+}

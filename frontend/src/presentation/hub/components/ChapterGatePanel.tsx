@@ -1,6 +1,7 @@
 import { WorldProgressionStatus } from "@/domain/gameplay/progression/WorldProgressionManager";
 import { usePlayUiSound } from "@/presentation/game/hooks/usePlayUiSound";
 import type { ChapterMeta } from "../chapterData";
+import { CHAPTER_POPUP_DESCRIPTIONS } from "../chapterData";
 
 export interface ChapterGatePanelProps {
   readonly meta: ChapterMeta;
@@ -39,7 +40,9 @@ export function ChapterGatePanel({
           </h2>
         </div>
 
-        <p className="text-sm italic text-garden-300">&ldquo;{meta.lessonSummary}&rdquo;</p>
+        <p className="text-sm italic text-garden-300">
+          &ldquo;{CHAPTER_POPUP_DESCRIPTIONS.get(meta.chapterId) ?? meta.lessonSummary}&rdquo;
+        </p>
 
         {isLocked ? (
           <p className="rounded border border-garden-700 bg-black/30 p-3 text-sm text-garden-500">
@@ -62,7 +65,7 @@ export function ChapterGatePanel({
             }}
             className="flex-1 rounded border border-garden-700 px-4 py-2 text-sm text-garden-300 hover:text-light-divine"
           >
-            Close
+            Cancel
           </button>
           {!isLocked && (
             <button
@@ -73,7 +76,7 @@ export function ChapterGatePanel({
               }}
               className="flex-1 rounded bg-garden-700 px-4 py-2 text-sm text-light-divine hover:bg-garden-500"
             >
-              {isCompleted ? "Replay" : "Start"}
+              {isCompleted ? "Replay Chapter" : "Start Chapter"}
             </button>
           )}
         </div>

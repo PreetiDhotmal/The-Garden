@@ -1,0 +1,20 @@
+spring:
+  # Re-enables what the base application.yml disables by default. The
+  # `dev` profile is what docker-compose's backend service runs with,
+  # where a real Postgres container IS available — so unlike the bare
+  # no-profile default, dev should actually use it.
+  autoconfigure:
+    exclude: []
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:the_garden}
+    username: ${DB_USERNAME:the_garden}
+    password: ${DB_PASSWORD:the_garden}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+logging:
+  level:
+    com.thegarden: DEBUG
+    org.hibernate.SQL: DEBUG

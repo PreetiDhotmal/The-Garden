@@ -21,8 +21,10 @@ import { createExclusionZones } from "@/infrastructure/world/vegetation/Exclusio
 import type { GraphicsQualityPreset } from "@/domain/engine/config/GraphicsQualityPreset";
 import type { WorldProgressionQueryContext } from "@/domain/gameplay/progression/WorldUnlockCondition";
 import { useGameFramework } from "@/presentation/game/hooks/useGameFramework";
-import { CHAPTER_META_BY_ID } from "../chapterData";
+import { CHAPTER_META_BY_ID, getChapterScripture } from "../chapterData";
+import { ScriptureWall } from "./ScriptureWall";
 import { ChapterGateStructure } from "./ChapterGateStructure";
+import { WorldProgressionStatus } from "@/domain/gameplay/progression/WorldProgressionManager";
 import { HubSaveShrine } from "./HubSaveShrine";
 import {
   HUB_WORLD_WIDTH,
@@ -156,7 +158,7 @@ export function HubGardenScene({
           scene={bushProp.scene}
           baseScale={propScale(ENVIRONMENT_PROP_IDS.BUSH)}
           seed={22}
-          count={Math.round(20 * qualityPreset.foliageDensityMultiplier)}
+          count={Math.round(34 * qualityPreset.foliageDensityMultiplier)}
           areaWidth={HUB_WORLD_WIDTH}
           areaDepth={HUB_WORLD_DEPTH}
           heightFunction={heightFunction}
@@ -168,15 +170,16 @@ export function HubGardenScene({
       {heightFunction && (
         <VegetationField
           seed={23}
-          count={Math.round(500 * qualityPreset.foliageDensityMultiplier)}
+          count={Math.round(8500 * qualityPreset.foliageDensityMultiplier)}
           areaWidth={HUB_WORLD_WIDTH}
           areaDepth={HUB_WORLD_DEPTH}
           heightFunction={heightFunction}
           isExcluded={hubExclusion}
           geometry={grassBladeGeometry}
           color="#5a9450"
-          minScale={0.7}
+          minScale={0.6}
           maxScale={1.3}
+          maxLeanRadians={0.35}
           windStrength={0.25}
           castShadow={false}
         />
@@ -184,7 +187,7 @@ export function HubGardenScene({
       {heightFunction && (
         <VegetationField
           seed={24}
-          count={Math.round(30 * qualityPreset.foliageDensityMultiplier)}
+          count={Math.round(50 * qualityPreset.foliageDensityMultiplier)}
           areaWidth={HUB_WORLD_WIDTH}
           areaDepth={HUB_WORLD_DEPTH}
           heightFunction={heightFunction}
@@ -269,6 +272,19 @@ export function HubGardenScene({
           `hub-zone:${chapter.definition.chapterId}`
         );
 
+        const scriptureEntry = getChapterScripture(chapter.definition.chapterId);
+        const isCompleted = chapter.status === WorldProgressionStatus.COMPLETED;
+        const isLocked = chapter.status === WorldProgressionStatus.LOCKED;
+        const previousChapterDisplayName = chapters[index - 1]?.definition.displayName ?? null;
+        const growthOffsets: readonly [number, number][] = [
+          [-2.2, -1.4],
+          [2.3, -1.1],
+          [-1.6, 1.8],
+          [1.8, 1.6],
+          [0, -2.4],
+          [-2.8, 0.6],
+        ];
+
         return (
           <group key={chapter.definition.chapterId}>
             <ChapterGateStructure
@@ -277,12 +293,54 @@ export function HubGardenScene({
               status={chapter.status}
               restorationWarmth={restorationProfile.lightingWarmth}
             />
+            {isCompleted &&
+              growthOffsets.map(([dx, dz], growthIndex) => {
+                const worldX = x + dx * Math.cos(rotationY) - dz * Math.sin(rotationY);
+                const worldZ = z + dx * Math.sin(rotationY) + dz * Math.cos(rotationY);
+                const growthY = heightFunction ? heightFunction(worldX, worldZ) : groundY;
+                return (
+                  <mesh
+                    key={`growth-${growthIndex.toString()}`}
+                    geometry={flowerGeometry}
+                    position={[worldX, growthY, worldZ]}
+                    rotation={[0, growthIndex * 1.3, 0]}
+                    scale={0.9 + (growthIndex % 3) * 0.2}
+                    castShadow={false}
+                  >
+                    <meshStandardMaterial color="#e8e0a0" roughness={0.85} />
+                  </mesh>
+                );
+              })}
+            {scriptureEntry?.isImplemented && (
+              <ScriptureWall
+                chapterId={chapter.definition.chapterId}
+                chapterTitle={meta.displayName}
+                verseReference={{
+                  bookName: scriptureEntry.reference.bookName,
+                  chapter: scriptureEntry.reference.chapter,
+                  verseStart: scriptureEntry.reference.verseStart,
+                  verseEnd: scriptureEntry.reference.verseEnd,
+                  translationCode: "NIV",
+                }}
+                fallbackVerseText={scriptureEntry.fallbackVerseText}
+                reflection={scriptureEntry.reflection}
+                isCompleted={isCompleted}
+                position={[x + Math.sin(rotationY) * 2.5, groundY, z + Math.cos(rotationY) * 2.5]}
+                rotationY={rotationY}
+              />
+            )}
             <InteractableObject
               id={`interactable:gate:${chapter.definition.chapterId}`}
               position={[x, groundY + 1, z]}
-              promptText={`View ${meta.displayName}`}
+              promptText={
+                isLocked
+                  ? previousChapterDisplayName
+                    ? `Locked — Complete ${previousChapterDisplayName} first`
+                    : "Locked"
+                  : `View ${meta.displayName}`
+              }
               radius={4}
-              color="#c9a84c"
+              color={isLocked ? "#5a5648" : "#c9a84c"}
               onInteract={() => {
                 onGateInteract(chapter.definition.chapterId);
               }}

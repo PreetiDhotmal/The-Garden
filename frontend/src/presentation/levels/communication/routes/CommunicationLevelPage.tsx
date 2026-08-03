@@ -14,6 +14,7 @@ import { GameCanvas } from "@/presentation/engine/components/GameCanvas";
 import { SplitScreenRenderer } from "@/presentation/engine/components/SplitScreenRenderer";
 import { CommunicationLevelScene } from "@/presentation/levels/communication/CommunicationLevelScene";
 import { SceneErrorBoundary } from "@/presentation/engine/components/SceneErrorBoundary";
+import { ScreenFadeOverlay } from "@/presentation/engine/components/ScreenFadeOverlay";
 import {
   COMMUNICATION_LEVEL_ID,
   buildPuzzleOneStage,
@@ -97,6 +98,8 @@ function CommunicationLevelContent() {
   const groundHeightRef = useRef<((x: number, z: number) => number) | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [hasFocus, setHasFocus] = useState(false);
+  const [isFadingIn, setIsFadingIn] = useState(true);
+  const [isFadingOutToHub, setIsFadingOutToHub] = useState(false);
   const [levelState, setLevelState] = useState(PuzzleState.NOT_STARTED);
   const [, forceRerender] = useState(0);
 
@@ -397,11 +400,29 @@ function CommunicationLevelContent() {
           Entering the Garden together…
         </div>
       )}
-      {levelState === PuzzleState.COMPLETE && (
+      {isFadingIn && (
+        <ScreenFadeOverlay
+          direction="IN"
+          durationSeconds={0.6}
+          onComplete={() => {
+            setIsFadingIn(false);
+          }}
+        />
+      )}
+      {isFadingOutToHub && (
+        <ScreenFadeOverlay
+          direction="OUT"
+          durationSeconds={0.6}
+          onComplete={() => {
+            void navigate("/hub");
+          }}
+        />
+      )}
+      {levelState === PuzzleState.COMPLETE && !isFadingOutToHub && (
         <ReflectionScreen
           levelId={COMMUNICATION_LEVEL_ID}
           onContinue={() => {
-            void navigate("/hub");
+            setIsFadingOutToHub(true);
           }}
         />
       )}

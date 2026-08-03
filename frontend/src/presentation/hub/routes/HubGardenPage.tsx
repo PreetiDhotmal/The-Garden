@@ -13,9 +13,14 @@ import { LoadingScreen } from "@/presentation/engine/components/LoadingScreen";
 import { useAssetPreloader } from "@/presentation/engine/hooks/useAssetPreloader";
 import { HubGardenScene } from "@/presentation/hub/components/HubGardenScene";
 import { ChapterGatePanel } from "@/presentation/hub/components/ChapterGatePanel";
-import { CHAPTER_META_BY_ID } from "@/presentation/hub/chapterData";
+import { ScreenFadeOverlay } from "@/presentation/engine/components/ScreenFadeOverlay";
+import { CHAPTER_META_BY_ID, CHAPTER_LEVEL_ROUTES } from "@/presentation/hub/chapterData";
 import { CharacterScene } from "@/presentation/character/components/CharacterScene";
 import { InputSystem } from "@/infrastructure/input/InputSystem";
+import { MobileMovementInputSource } from "@/infrastructure/input/MobileMovementInputSource";
+import { MobileButtonInputSource } from "@/infrastructure/input/MobileButtonInputSource";
+import { MobileControls } from "@/presentation/mobile/MobileControls";
+import { Capacitor } from "@capacitor/core";
 import { createInputMapWithOverrides } from "@/domain/input/InputMap";
 import { KeyboardInputSource } from "@/infrastructure/input/KeyboardInputSource";
 import { MouseInputSource } from "@/infrastructure/input/MouseInputSource";
@@ -63,6 +68,9 @@ export function HubGardenContent({ shouldLoadSave = false }: HubGardenContentPro
   const containerRef = useRef<HTMLDivElement>(null);
   const cameraControllerRef = useRef<ThirdPersonCameraController | null>(null);
   const inputSystem = useMemo(() => new InputSystem(), []);
+  const mobileMovementSource = useMemo(() => new MobileMovementInputSource(), []);
+  const mobileButtonSource = useMemo(() => new MobileButtonInputSource(), []);
+  const isNativeMobile = useMemo(() => Capacitor.isNativePlatform(), []);
   const factory = useMemo(() => new CharacterFactory(), []);
 
   const selectedCharacterId =
@@ -85,6 +93,7 @@ export function HubGardenContent({ shouldLoadSave = false }: HubGardenContentPro
   const [isJournalOpen, setIsJournalOpen] = useState(false);
   const [isInventoryOpen, setIsInventoryOpen] = useState(false);
   const [openChapterId, setOpenChapterId] = useState<string | null>(null);
+  const [pendingLevelRoute, setPendingLevelRoute] = useState<string | null>(null);
   const [currentChapterId, setCurrentChapterId] = useState<string | null>(null);
 
   const getProgressionContext = useCallback(
@@ -206,10 +215,14 @@ export function HubGardenContent({ shouldLoadSave = false }: HubGardenContentPro
     inputSystem.addSource(new KeyboardInputSource(inputMap));
     inputSystem.addSource(new MouseInputSource(containerRef.current, mouseSensitivity));
     inputSystem.addSource(new GamepadInputSource(inputMap));
+    if (isNativeMobile) {
+      inputSystem.addSource(mobileMovementSource);
+      inputSystem.addSource(mobileButtonSource);
+    }
     return () => {
       inputSystem.removeAllSources();
     };
-  }, [inputSystem, mouseSensitivity, keyBindingOverrides]);
+  }, [inputSystem, mouseSensitivity, keyBindingOverrides, isNativeMobile, mobileMovementSource, mobileButtonSource]);
 
   const animationConfig = useMemo(() => {
     if (!data) {
@@ -344,22 +357,39 @@ export function HubGardenContent({ shouldLoadSave = false }: HubGardenContentPro
             setOpenChapterId(null);
           }}
           onStart={() => {
-            if (openChapterId === "chapter:communication") {
-              void navigate("/level/communication");
-              return;
-            }
-            if (openChapterId === "chapter:trust") {
-              void navigate("/level/trust");
+            const route = openChapterId ? CHAPTER_LEVEL_ROUTES.get(openChapterId) : undefined;
+            setOpenChapterId(null);
+            if (route) {
+              setPendingLevelRoute(route);
               return;
             }
             // Every other chapter's gameplay content is not yet built —
             // honestly reflecting that rather than faking a level.
-            setOpenChapterId(null);
+          }}
+        />
+      )}
+      {pendingLevelRoute && (
+        <ScreenFadeOverlay
+          direction="OUT"
+          durationSeconds={0.6}
+          onComplete={() => {
+            const route = pendingLevelRoute;
+            gameplayServices.saveManager
+              .saveToStorage()
+              .catch((error: unknown) => {
+                console.error("[HubGardenPage] Failed to save before entering chapter:", error);
+              })
+              .finally(() => {
+                void navigate(route);
+              });
           }}
         />
       )}
       <GameplayHud />
       <InteractionPromptUI />
+      {isNativeMobile && (
+        <MobileControls movementSource={mobileMovementSource} buttonSource={mobileButtonSource} />
+      )}
       {error && (
         <div className="fixed bottom-4 left-4 z-30 rounded bg-red-900/80 px-3 py-2 text-sm text-white">
           Failed to load character assets.

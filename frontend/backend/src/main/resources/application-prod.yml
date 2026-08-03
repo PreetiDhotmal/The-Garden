@@ -1,0 +1,25 @@
+spring:
+  # Critical: without this override, prod would inherit the base
+  # application.yml's new default (DB disabled) — see application.yml
+  # for why that default exists. Production always has a real
+  # Postgres (Railway/Neon), so it's explicitly re-enabled here.
+  autoconfigure:
+    exclude: []
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+springdoc:
+  swagger-ui:
+    enabled: ${SWAGGER_UI_ENABLED:false}
+
+logging:
+  level:
+    com.thegarden: INFO

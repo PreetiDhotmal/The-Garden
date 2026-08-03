@@ -82,8 +82,12 @@ export function GlobalMusicController() {
   }, [volume, isMuted]);
 
   // First real user interaction triggers play() - required by browser
-  // autoplay policy. Listens once (each listener removes itself after
-  // firing) across the three interaction types requested.
+  // autoplay policy. Listens across the three interaction types
+  // requested, and keeps listening until play() actually succeeds -
+  // if the first attempt fails for a transient reason (not yet
+  // buffered enough, a momentary network hiccup), a later interaction
+  // gets another chance rather than the app silently giving up after
+  // one failed try.
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) {
@@ -91,19 +95,34 @@ export function GlobalMusicController() {
     }
 
     const attemptPlay = () => {
-      audio.play().catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : String(error);
-        setDiagnostics((current) => ({ ...current, error: message }));
-        if (import.meta.env.DEV) {
-          console.error(`[GlobalMusicController] audio.play() failed: ${message}`);
-        }
-      });
+      if (audio.error) {
+        // Already in a known error state (e.g. failed to load) -
+        // graceful fallback: skip silently rather than firing another
+        // doomed play() call and another console entry for the same
+        // underlying problem every time the player clicks or presses
+        // a key. The game continues normally without music.
+        return;
+      }
+      audio
+        .play()
+        .then(() => {
+          window.removeEventListener("pointerdown", attemptPlay);
+          window.removeEventListener("keydown", attemptPlay);
+          window.removeEventListener("touchstart", attemptPlay);
+        })
+        .catch((error: unknown) => {
+          const message = error instanceof Error ? error.message : String(error);
+          setDiagnostics((current) => ({ ...current, error: message }));
+          if (import.meta.env.DEV) {
+            console.error(`[GlobalMusicController] audio.play() failed: ${message}`);
+          }
+          // Listeners stay attached - the next interaction gets another try.
+        });
     };
 
-    const options = { once: true };
-    window.addEventListener("pointerdown", attemptPlay, options);
-    window.addEventListener("keydown", attemptPlay, options);
-    window.addEventListener("touchstart", attemptPlay, options);
+    window.addEventListener("pointerdown", attemptPlay);
+    window.addEventListener("keydown", attemptPlay);
+    window.addEventListener("touchstart", attemptPlay);
 
     return () => {
       window.removeEventListener("pointerdown", attemptPlay);
